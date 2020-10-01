@@ -4,6 +4,8 @@
 --- DateTime: 9/30/20 3:44 AM
 ---
 
+local assertNotNull = require("assert_not_null")
+
 --- @class Vector2D
 --- @field x number
 --- @field y number
@@ -24,7 +26,7 @@ end
 --- @param direction defines.direction
 --- @return Vector2D
 function Vector2D.fromDirection(direction)
-    assertAllTruthy(direction)
+    assertNotNull(direction)
 
     if direction == 0 then
         return Vector2D.new(0, -1)
