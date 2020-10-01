@@ -8,6 +8,7 @@
 local ArrayList = {}
 ArrayList.__index = ArrayList
 
+--- Cast a list to ArrayList but doesn't change its values
 --- @generic T: ArrayList
 --- @param toCast T listToBeCased
 --- @return T
@@ -15,8 +16,9 @@ function ArrayList.cast(toCast)
     return setmetatable(toCast, ArrayList)
 end
 
+--- Returns a new ArrayList reference that contains all elements in passed in list
 --- @generic T: ArrayList
---- @param list T listToBeCased
+--- @param list T optional
 --- @return T
 function ArrayList.new(list)
     local o = setmetatable({}, ArrayList)
@@ -112,7 +114,7 @@ end
 --- @return ArrayList
 function ArrayList:map(f)
     assert(self and f)
-    local out = toArrayList {}
+    local out = ArrayList.new()
     for k, v in pairs(self) do
         out[k] = f(v)
     end
@@ -145,7 +147,7 @@ end
 --- @return ArrayList
 function ArrayList:filter(f)
     assert(self and f)
-    local out = toArrayList {}
+    local out = ArrayList.new()
     local i = 1
     for _, v in pairs(self) do
         if f(v) then
