@@ -103,11 +103,24 @@ end
 function ArrayList:popRight()
     assert(self)
     local element = self[#self]
-    if not element then
+    if element == nil then
         return nil
     end
     self[#self] = nil
     return element
+end
+
+function ArrayList:popLeft()
+    assert(self)
+    local firstElement = self[1]
+    if firstElement == nil then
+        return nil
+    end
+    for i = 1, #self - 1, 1 do
+        self[i] = self[i + 1]
+    end
+    self[#self] = nil
+    return firstElement
 end
 
 --- @param f fun(ele: any):any
