@@ -47,7 +47,7 @@ function logging.log(msg, loggingCategory)
     loggingCategory = loggingCategory or logging.D
     assert(logging.categories[loggingCategory] ~= nil, "no such logging category: " .. tostring(loggingCategory))
     if logging.shouldOutput(loggingCategory) then
-        game.print(serpent.line(msg))
+        game.print(type(msg) == "string" and msg or serpent.line(msg))
     end
 end
 
