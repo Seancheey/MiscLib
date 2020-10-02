@@ -4,6 +4,8 @@
 --- DateTime: 10/1/20 2:38 AM
 ---
 
+--- @class Copier
+---@type Copier
 local Copier = {}
 
 --- @generic T

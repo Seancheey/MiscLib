@@ -4,6 +4,9 @@
 --- DateTime: 10/1/20 2:40 AM
 ---
 
+--- @class Logger
+
+--- @type Logger
 local logging = {}
 
 logging.E = 1
