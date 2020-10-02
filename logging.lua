@@ -25,12 +25,12 @@ logging.categories = {
 
 function logging.enableCategory(loggingCategory)
     assert(loggingCategory ~= nil)
-    loggingCategory.categories[loggingCategory] = true
+    logging.categories[loggingCategory] = true
 end
 
 function logging.disableCategory(loggingCategory)
     assert(loggingCategory ~= nil)
-    loggingCategory.categories[loggingCategory] = false
+    logging.categories[loggingCategory] = false
 end
 
 function logging.addCategory(loggingCategory, enabled)
