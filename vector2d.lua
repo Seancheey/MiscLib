@@ -87,12 +87,28 @@ function Vector2D:__add(other)
 end
 
 --- @return Vector2D
-function Vector2D.__sub(other)
+function Vector2D:__sub(other)
     return Vector2D.new(self.x - other.x, self.y - other.y)
 end
 
+--- @return boolean
 function Vector2D.__eq(ca, cb)
     return ca.x == cb.x and ca.y == cb.y
+end
+
+--- @return number
+function Vector2D:l1Norm()
+    return math.abs(self.x) + math.abs(self.y)
+end
+
+--- @return number
+function Vector2D:l2Norm()
+    return math.sqrt(self.x * self.x + self.y * self.y)
+end
+
+--- @return number
+function Vector2D:lInfNorm()
+    return math.max(math.abs(self.x), math.abs(self.y))
 end
 
 return Vector2D
