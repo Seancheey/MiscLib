@@ -131,7 +131,7 @@ function ArrayList:pop(index)
     if #self >= index then
         local element = self[index]
         for shift = index, #self - 1 do
-            self[#shift] = self[#shift + 1]
+            self[shift] = self[shift + 1]
         end
         self[#self] = nil
         return element
