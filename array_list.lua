@@ -123,6 +123,21 @@ function ArrayList:popLeft()
     return firstElement
 end
 
+function ArrayList:pop(index)
+    assert(self)
+    if not index then
+        return ArrayList:popRight()
+    end
+    if #self >= index then
+        local element = self[index]
+        for shift = index, #self - 1 do
+            self[#shift] = self[#shift + 1]
+        end
+        self[#self] = nil
+        return element
+    end
+end
+
 --- @param f fun(ele: any):any
 --- @return ArrayList
 function ArrayList:map(f)
