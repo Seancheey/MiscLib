@@ -13,11 +13,11 @@ GuiLib.listeningEvents = ArrayList.new()
 
 --- @alias EventHandler fun(e: event)
 
+--- Master table for tracking all handlers
 --- @type table<defines.events, table<player_index, table<string, EventHandler>>>
 GuiLib.guiHandlers = {}
---- @type table<defines.events,table<string, EventHandler>>
-GuiLib.globalGuiHandlers = {}
 
+--- Default gui root
 GuiLib.rootName = "left"
 
 --- This function should be called in control.lua. Should be called in control.lua to initialize all events to be listened.
@@ -25,16 +25,7 @@ GuiLib.rootName = "left"
 function GuiLib.listenToEvent(event)
     GuiLib.listeningEvents:add(event)
     GuiLib.guiHandlers[event] = {}
-    GuiLib.globalGuiHandlers[event] = {}
     script.on_event(event, function(e)
-        -- handle global events
-        for gui_path, handle in pairs(GuiLib.globalGuiHandlers[event]) do
-            if e.element.name == gui_path then
-                handle(e)
-                return
-            end
-        end
-
         if not GuiLib.guiHandlers[event][e.player_index] then
             return
         end
@@ -58,55 +49,50 @@ function GuiLib.listenToEvents(event_list)
     end
 end
 
+--- Helper function for adding a gui element while at the same time add event handlers to it.
+--- With this function, you are able to write gui element definition and gui event handler together for better readability.
+--- @param gui_parent LuaGuiElement
+--- @param element_spec LuaGuiElement gui element specification table, but not an actual gui element
+--- @param event_to_handler_table table<defines.events, EventHandler>
+--- @return LuaGuiElement
+function GuiLib.addGuiElementWithHandler(gui_parent, element_spec, event_to_handler_table)
+    assertNotNull(gui_parent, element_spec)
+    local newElement = gui_parent.add(element_spec)
+    if event_to_handler_table then
+        for event, handler in pairs(event_to_handler_table) do
+            GuiLib.registerGuiHandler(newElement, event, handler)
+        end
+    end
+end
+
 --- register a *handler* that handles *event* for gui element *gui_elem* of player with *player_index*
---- @param player_index number
---- @param gui_elem LuaGuiElement
+--- @param guiElement LuaGuiElement
 --- @param event defines.events
 --- @param handler fun(e)
-function GuiLib.registerGuiHandler(player_index, gui_elem, event, handler)
-    assertNotNull(player_index, gui_elem, event, handler)
+function GuiLib.registerGuiHandler(guiElement, event, handler)
+    assertNotNull(guiElement, event, handler)
     assert(type(handler) == "function", "handler should be a function")
-    assert(gui_elem.name ~= "", "gui's name can't be nil")
+    assert(guiElement.name ~= "", "gui's name can't be nil")
     assert(GuiLib.guiHandlers[event] ~= nil, "event is not listened, please call GuiLib.listenToEvent(event) first")
 
-    local gui_path = GuiLib.path_of(gui_elem)
+    local gui_path = GuiLib.path_of(guiElement)
     for _, elem_name in pairs(GuiLib.__split_path(gui_path)) do
-        assert(elem_name ~= "", "there is an element in path of " .. gui_elem.name .. "without name")
+        assert(elem_name ~= "", "there is an element in path of " .. guiElement.name .. "without name")
     end
-    if not GuiLib.guiHandlers[event][player_index] then
-        GuiLib.guiHandlers[event][player_index] = {}
+    if not GuiLib.guiHandlers[event][guiElement.player_index] then
+        GuiLib.guiHandlers[event][guiElement.player_index] = {}
     end
-    GuiLib.guiHandlers[event][player_index][gui_path] = handler
+    GuiLib.guiHandlers[event][guiElement.player_index][gui_path] = handler
 end
 
---- register a global handler for a certain event for gui element with gui_path
---- this function is particularly useful for events handling on script loading stage, where no player is availiable
---- @param gui_path string
+--- @param element LuaGuiElement
 --- @param event defines.events
---- @param handler EventHandler
-function GuiLib.registerPersistentGuiHandler(gui_path, event, handler)
-    assertNotNull(gui_path, event, handler)
-
-    GuiLib.globalGuiHandlers[event] = GuiLib.globalGuiHandlers[event] or {}
-    GuiLib.globalGuiHandlers[event][gui_path] = handler
+function GuiLib.unregisterGuiHandler(element, event)
+    assertNotNull(element, event)
+    GuiLib.guiHandlers[event][element.player_index][GuiLib.path_of(element)] = nil
 end
 
---- @param gui_elem LuaGuiElement
---- @param player_index player_index
---- @param event defines.events
-function GuiLib.unregisterGuiHandler(player_index, gui_elem, event)
-    assertNotNull(player_index, gui_elem, event)
-
-    GuiLib.guiHandlers[event][player_index][GuiLib.path_of(gui_elem)] = nil
-end
-
-function GuiLib.unregisterGuiChildrenEventHandlers(player_index, gui_parent, event)
-    for _, child in pairs(gui_parent.children) do
-        GuiLib.unregisterGuiHandler(player_index, child, event)
-    end
-end
-
---- unregister all handlers of gui_elem and its children
+--- Unregister all handlers of gui element as well as its children.
 --- @param element LuaGuiElement
 function GuiLib.unregisterAllHandlers(element)
     assert(element)
@@ -128,31 +114,6 @@ function GuiLib.gui_root(player_index)
     local root = game.players[player_index].gui[GuiLib.rootName]
     assert(root ~= nil, "unable to find player's gui root")
     return root
-end
-
---- helper function for adding a gui element while at the same time add event handlers to it
---- @param gui_parent LuaGuiElement
---- @param element_spec LuaGuiElement gui element specification table, but not an actual gui element
---- @param event_to_handler_table table<defines.events, EventHandler>
---- @return LuaGuiElement
-function GuiLib.addGuiElementWithHandler(gui_parent, element_spec, event_to_handler_table)
-    assertNotNull(gui_parent, element_spec)
-    local newElement = gui_parent.add(element_spec)
-    if event_to_handler_table then
-        for event, handler in pairs(event_to_handler_table) do
-            GuiLib.registerGuiHandler(gui_parent.player_index, newElement, event, handler)
-        end
-    end
-end
-
---- @param element LuaGuiElement
-function GuiLib.clearGuiElementChildren(element)
-    assert(element)
-
-    for _, child in ipairs(element.children) do
-        GuiLib.unregisterAllHandlers(child)
-    end
-    element.clear()
 end
 
 --- @param element LuaGuiElement
@@ -191,7 +152,7 @@ function GuiLib.path_of(gui_elem)
     return path
 end
 
--- returns the path of a gui element represented by a list in order of [elem_name, parent_name, ... , root_name]
+--- returns the path of a gui element represented by a list in order of [elem_name, parent_name, ... , root_name]
 function GuiLib.__split_path(str)
     local t = {}
     for s in string.gmatch(str, "([^|]+)") do
