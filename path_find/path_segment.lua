@@ -48,7 +48,8 @@ function PathSegment:fromLuaEntity(entity, halfUndergroundPipeAsInput)
         name = entityName,
         position = Vector2D.fromPosition(entity.position),
         direction = entity.direction or defines.direction.north,
-        distance = 1
+        distance = 1,
+        type = (entity.type == "underground-belt") and entity.belt_to_ground_type
     }
     if halfUndergroundPipeAsInput and EntityRoutingAttribute.from(entityName).lineType == TransportLineType.fluidLine and EntityRoutingAttribute.from(entityName).isUnderground then
         newUnit.direction = reverseDirection(newUnit.direction)
@@ -93,7 +94,7 @@ function PathSegment:toEntitySpecs()
         else
             if self.distance == 1 then
                 return {
-                    { name = self.name, direction = self.distance, position = self.position, type = self.type }
+                    { name = self.name, direction = self.direction, position = self.position, type = self.type }
                 }
             else
                 return {
@@ -168,7 +169,19 @@ function PathSegment:possiblePrevPathSegments(allowUnderground, canPlaceEntityFu
                     end
                 end
             end
-            if allowUnderground then
+            if self.type == "output" then
+                -- special case for output typed underground belt adds underground candidates
+                for underground_distance = undergroundPrototype.max_underground_distance, 1, -1 do
+                    candidates:add(PathSegment:new {
+                        name = undergroundPrototype.name,
+                        direction = reverseDirection(posDiffDirection),
+                        position = pointPos + posDiffVector:scale(underground_distance),
+                        distance = 1,
+                        type = "input"
+                    })
+                end
+                break
+            elseif allowUnderground then
                 -- adds underground candidates
                 for underground_distance = undergroundPrototype.max_underground_distance + 1, 3, -1 do
                     candidates:add(PathSegment:new {

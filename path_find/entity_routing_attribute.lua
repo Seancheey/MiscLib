@@ -18,9 +18,9 @@ local logging = require("__MiscLib__/logging")
 --- @type Vector2D
 local Vector2D = require("__MiscLib__/vector2d")
 --- @type EntityTransportType
-local EntityTransportType = require("enum/entity_transport_type")
+local EntityTransportType = require("__MiscLib__/enum/entity_transport_type")
 --- @type TransportLineType
-local TransportLineType = require("enum/line_type")
+local TransportLineType = require("__MiscLib__/enum/line_type")
 --- @type DirectionHelper
 local DirectionHelper = require("__MiscLib__/direction_helper")
 --- @type ArrayList
