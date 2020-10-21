@@ -137,13 +137,13 @@ function MinHeap:del(idx)
 end
 
 --- @return MinHeap
-function MinHeap.new(lessThanFunc)
+function MinHeap:new(lessThanFunc)
     return setmetatable({
         arr = {},
         len = 0,
         lessFunc = lessThanFunc or isLessThen
     }, {
-        __index = MinHeap
+        __index = self or MinHeap
     })
 end
 

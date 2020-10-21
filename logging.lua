@@ -9,11 +9,11 @@
 --- @type Logger
 local logging = {}
 
-logging.E = 1
-logging.W = 2
-logging.I = 3
-logging.D = 4
-logging.V = 5
+logging.E = "Error"
+logging.W = "Warning"
+logging.I = "Info"
+logging.D = "Debug"
+logging.V = "Verbose"
 
 logging.categories = {
     [logging.E] = true,
@@ -45,7 +45,11 @@ end
 
 function logging.log(msg, loggingCategory)
     loggingCategory = loggingCategory or logging.D
-    assert(logging.categories[loggingCategory] ~= nil, "no such logging category: " .. tostring(loggingCategory))
+    if logging.categories[loggingCategory] == nil then
+        game.print("WARNING: unknown logging category \"" .. tostring(loggingCategory) .. "\". Please use logging.addCategory() to specify whether to enable or disable it.")
+        game.print("WARNING: automatically enable logging category\"" .. tostring(loggingCategory) .. "\".")
+        logging.addCategory(loggingCategory, true)
+    end
     if logging.shouldOutput(loggingCategory) then
         game.print(type(msg) == "string" and msg or serpent.line(msg))
     end

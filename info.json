@@ -1,11 +1,11 @@
 {
     "name": "MiscLib",
-    "version": "0.7.0",
+    "version": "0.8.0",
     "title": "MiscLib",
     "author": "Qiyi Shan",
     "contact": "adls371@outlook.com",
     "homepage": "https://github.com/Seancheey/MiscLib",
     "factorio_version": "1.0",
     "dependencies": ["base"],
-    "description": "Lua Library for ArrayList, LinkedList, MinHeap, Pointer, Vector2D, map/reduce/filter function, guilib etc."
+    "description": "Lua Library for ArrayList, LinkedList, MinHeap, Pointer, Vector2D, map/reduce/filter function, guilib, PathFinder etc."
 }
