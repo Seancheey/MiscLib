@@ -51,7 +51,7 @@ function logging.log(msg, loggingCategory)
         logging.addCategory(loggingCategory, true)
     end
     if logging.shouldOutput(loggingCategory) then
-        game.print(type(msg) == "string" and msg or serpent.line(msg))
+        game.print(tostring(loggingCategory).. ": " .. (type(msg) == "string" and msg or serpent.line(msg)), {0.5,1,0.5})
     end
 end
 
