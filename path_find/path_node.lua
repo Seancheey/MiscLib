@@ -28,8 +28,6 @@ function PathNode:new(pathUnit, prevChain, preferOnGround)
     if unitDistance > 1 then
         if preferOnGround then
             unitDistance = 2 * unitDistance
-        else
-            unitDistance = unitDistance * 0.999999
         end
     end
     -- reward a little to to not turning
