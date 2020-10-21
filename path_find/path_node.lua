@@ -8,7 +8,7 @@ local assertNotNull = require("assert_not_null")
 --- Transport chain is an intermediate generated backward linked list node that represents a whole transport line.
 --- Each node in this linked list represents either one belt, or a pair of underground belt. (in this case the "entity" field represents the input belt, and output belt is inferred by entityDistance + direction)
 --- @class PathNode
---- @field pathUnit PathUnit
+--- @field pathUnit PathSegment
 --- @field prevChain PathNode
 --- @field cumulativeDistance number
 --- @field leftCumulativeTurns number can't be negative, if ever >=3, we enforce collision check
@@ -17,7 +17,7 @@ local assertNotNull = require("assert_not_null")
 local PathNode = {}
 PathNode.__index = PathNode
 
---- @param pathUnit PathUnit
+--- @param pathUnit PathSegment
 --- @param prevChain PathNode
 --- @param preferOnGround boolean if enabled, will apply A* distance punishment to underground belts
 --- @return PathNode
