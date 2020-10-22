@@ -29,7 +29,7 @@ local DirectionHelper = require("__MiscLib__/direction_helper")
 --- @field direction defines.direction
 --- @field position Vector2D Starting point position for the path unit
 --- @field distance number Distance of the path unit, minimum 1
---- @field type '"input"'|'"output"'|nil only used for unpaired underground belt entity, otherwise nil
+--- @field type '"input"'|'"output"'|nil only used for unpaired single underground belt entity, otherwise nil
 --- @type PathSegment
 local PathSegment = {}
 
@@ -121,6 +121,18 @@ function PathSegment:possibleNextPathSegments(allowUnderground)
         for _, posDiffDirection in ipairs(posDiffDirections) do
             local posDiffVector = Vector2D.fromDirection(posDiffDirection)
             local newPosition = endingPosition + posDiffVector
+            if self.type == "input" then
+                for undergroundDistance = 1, undergroundPrototype.max_underground_distance do
+                    candidates:add(PathSegment:new {
+                        name = undergroundPrototype.name,
+                        direction = posDiffDirection,
+                        position = self.position + posDiffVector:scale(undergroundDistance),
+                        distance = 1,
+                        type = "output"
+                    })
+                end
+                break
+            end
             if allowUnderground then
                 -- adds underground candidates
                 for underground_distance = 3, undergroundPrototype.max_underground_distance + 1 do
