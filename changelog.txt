@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------------------------------
+Version: 0.8.1
+Date: 2020.10.21
+  Optimisations:
+    - Supports entity ghost routing attribute
