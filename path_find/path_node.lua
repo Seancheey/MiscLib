@@ -27,12 +27,14 @@ function PathNode:new(pathUnit, prevChain, preferOnGround)
     -- if prefer on ground, punish underground belts
     if unitDistance > 1 then
         if preferOnGround then
-            unitDistance = 2 * unitDistance
+            unitDistance = unitDistance + 1
+        else
+            unitDistance = unitDistance - 1
         end
     end
-    -- reward a little to to not turning
-    if prevChain and pathUnit.direction == prevChain.pathUnit.direction then
-        unitDistance = unitDistance - 0.000001
+    -- punish a little to to turning, set as 2 since this punishment is greater than the reward for going with underground belt.
+    if prevChain and pathUnit.direction ~= prevChain.pathUnit.direction then
+        unitDistance = unitDistance + 2
     end
     if prevChain then
         local directionDifference = (pathUnit.direction - prevChain.pathUnit.direction + 4) % 8 - 4
