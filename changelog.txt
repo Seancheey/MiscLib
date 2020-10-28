@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.8.3
+Date: 2020.10.28
+  Features:
+    - PathNode now accepts playerConfig for turning punishment and underground punishment
+
+---------------------------------------------------------------------------------------------------
 Version: 0.8.2
 Date: 2020.10.23
   Optimisations:

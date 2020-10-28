@@ -19,22 +19,22 @@ PathNode.__index = PathNode
 
 --- @param pathUnit PathSegment
 --- @param prevChain PathNode
---- @param preferOnGround boolean if enabled, will apply A* distance punishment to underground belts
+--- @param playerConfig LineConnectConfig
 --- @return PathNode
-function PathNode:new(pathUnit, prevChain, preferOnGround)
+function PathNode:new(pathUnit, prevChain, playerConfig)
     assertNotNull(pathUnit)
-    local unitDistance = pathUnit.distance
+    playerConfig = playerConfig or {}
+    local distanceIncrease = pathUnit.distance
     -- if prefer on ground, punish underground belts
-    if unitDistance > 1 then
-        if preferOnGround then
-            unitDistance = unitDistance + 1
-        else
-            unitDistance = unitDistance - 1
+    if distanceIncrease > 1 then
+        if playerConfig.preferOnGround then
+            distanceIncrease = distanceIncrease + (playerConfig.preferGroundModeUndergroundPunishment or 1)
         end
+        distanceIncrease = distanceIncrease * 0.999
     end
     -- punish a little to to turning, set as 2 since this punishment is greater than the reward for going with underground belt.
     if prevChain and pathUnit.direction ~= prevChain.pathUnit.direction then
-        unitDistance = unitDistance + 2
+        distanceIncrease = distanceIncrease + (playerConfig.turningPunishment or 2)
     end
     if prevChain then
         local directionDifference = (pathUnit.direction - prevChain.pathUnit.direction + 4) % 8 - 4
@@ -59,7 +59,7 @@ function PathNode:new(pathUnit, prevChain, preferOnGround)
         return setmetatable({
             pathUnit = pathUnit,
             prevChain = prevChain,
-            cumulativeDistance = (prevChain.cumulativeDistance + unitDistance) or 0,
+            cumulativeDistance = (prevChain.cumulativeDistance + distanceIncrease) or 0,
             enforceCollisionCheck = enforceCollisionCheck,
             leftCumulativeTurns = leftTurnNum,
             rightCumulativeTurns = rightTurnNum
