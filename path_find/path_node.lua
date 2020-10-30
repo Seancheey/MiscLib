@@ -4,6 +4,8 @@
 --- DateTime: 10/20/20 9:04 PM
 ---
 local assertNotNull = require("assert_not_null")
+--- @type Logger
+local logging = require("__MiscLib__/logging")
 
 --- Transport chain is an intermediate generated backward linked list node that represents a whole transport line.
 --- Each node in this linked list represents either one belt, or a pair of underground belt. (in this case the "entity" field represents the input belt, and output belt is inferred by entityDistance + direction)
@@ -50,6 +52,9 @@ function PathNode:new(pathUnit, prevChain, playerConfig)
                 -- left turn
                 leftTurnNum = leftTurnNum + 1
                 rightTurnNum = rightTurnNum == 0 and rightTurnNum or rightTurnNum - 1
+            elseif directionDifference <= -4 or directionDifference >= 4 then
+                -- 180 degree turn
+                enforceCollisionCheck = true
             end
             -- if turn num >= 3, it means there is a possibility for the transport line to form a circle and thus have a chance of self-colliding
             if rightTurnNum >= 3 or leftTurnNum >= 3 then
@@ -89,6 +94,13 @@ function PathNode:placeAllEntities(placeFunc)
             place(entitySpec)
         end
         transportChain = transportChain.prevChain
+    end
+end
+
+function PathNode:logSelf()
+    logging.log(serpent.line(self, { keyignore = { "prevChain" } }))
+    if self.prevChain then
+        self.prevChain:logSelf()
     end
 end
 
