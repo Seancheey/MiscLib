@@ -49,6 +49,13 @@ function GuiLib.listenToEvents(event_list)
     end
 end
 
+function GuiLib.addGuiElementToAllPlayers(element_spec, event_to_handler_table)
+    assertNotNull(element_spec, event_to_handler_table)
+    for player_index, _ in pairs(game.players) do
+        GuiLib.addGuiElementWithHandler(GuiLib.gui_root(player_index), element_spec, event_to_handler_table)
+    end
+end
+
 --- Helper function for adding a gui element while at the same time add event handlers to it.
 --- With this function, you are able to write gui element definition and gui event handler together for better readability.
 --- @param gui_parent LuaGuiElement
