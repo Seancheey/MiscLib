@@ -1,12 +1,6 @@
 --- @type ArrayList
 local ArrayList = require("array_list")
 local assertNotNull = require("assert_not_null")
---- @type Logger
-local logging = require("logging")
-logging.addCategory("guilib", true)
-local log = function(msg)
-    logging.log(msg, "guilib")
-end
 
 --- @class GuiLib
 --- @type GuiLib
@@ -44,8 +38,6 @@ function GuiLib.listenToEvent(event)
             if GuiLib.path_of(e.element) == path then
                 handler(e)
                 return
-            else
-                log(GuiLib.path_of(e.element) .. " doesn't match path " .. path)
             end
         end
         if not GuiLib.guiHandlers[event][e.player_index] then
