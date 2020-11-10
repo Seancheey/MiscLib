@@ -1,6 +1,12 @@
 --- @type ArrayList
 local ArrayList = require("array_list")
 local assertNotNull = require("assert_not_null")
+--- @type Logger
+local logging = require("logging")
+logging.addCategory("guilib", true)
+local log = function(msg)
+    logging.log(msg, "guilib")
+end
 
 --- @class GuiLib
 --- @type GuiLib
@@ -17,6 +23,9 @@ GuiLib.listeningEvents = ArrayList.new()
 --- @type table<defines.events, table<player_index, table<string, EventHandler>>>
 GuiLib.guiHandlers = {}
 
+--- @type table<defines.events, table<string, EventHandler>>
+GuiLib.globalGuiHandlers = {}
+
 --- Default gui root
 GuiLib.rootName = "left"
 
@@ -25,7 +34,20 @@ GuiLib.rootName = "left"
 function GuiLib.listenToEvent(event)
     GuiLib.listeningEvents:add(event)
     GuiLib.guiHandlers[event] = {}
+    GuiLib.globalGuiHandlers[event] = {}
     script.on_event(event, function(e)
+        if not e.element then
+            return
+        end
+        -- handle persistent events
+        for path, handler in pairs(GuiLib.globalGuiHandlers[event]) do
+            if GuiLib.path_of(e.element) == path then
+                handler(e)
+                return
+            else
+                log(GuiLib.path_of(e.element) .. " doesn't match path " .. path)
+            end
+        end
         if not GuiLib.guiHandlers[event][e.player_index] then
             return
         end
@@ -49,10 +71,11 @@ function GuiLib.listenToEvents(event_list)
     end
 end
 
-function GuiLib.addGuiElementToAllPlayers(element_spec, event_to_handler_table)
-    assertNotNull(element_spec, event_to_handler_table)
-    for player_index, _ in pairs(game.players) do
-        GuiLib.addGuiElementWithHandler(GuiLib.gui_root(player_index), element_spec, event_to_handler_table)
+--- @param elementName string
+function GuiLib.registerGuiHandlerForAllPlayers(elementName, event_to_handler_table)
+    assertNotNull(elementName, event_to_handler_table)
+    for event, handler in ipairs(event_to_handler_table) do
+        GuiLib.globalGuiHandlers[event][elementName] = handler
     end
 end
 
@@ -149,8 +172,8 @@ end
 function GuiLib.path_of(gui_elem)
     assertNotNull(gui_elem)
 
-    local current_element = gui_elem
-    local path = ""
+    local path = gui_elem.name
+    local current_element = gui_elem.parent
     while current_element and current_element.name ~= GuiLib.rootName do
         path = current_element.name .. "|" .. path
         current_element = current_element.parent
