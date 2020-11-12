@@ -32,7 +32,7 @@ function PathNode:new(pathUnit, prevChain, playerConfig)
         if playerConfig.preferOnGround then
             distanceIncrease = distanceIncrease + (playerConfig.preferGroundModeUndergroundPunishment or 1)
         end
-        distanceIncrease = distanceIncrease * 0.999
+        distanceIncrease = distanceIncrease * ((playerConfig.preferOnGround and not playerConfig.preferLongestUnderground) and 1.5 or 0.999)
     end
     -- punish a little to to turning, set as 2 since this punishment is greater than the reward for going with underground belt.
     if prevChain and pathUnit.direction ~= prevChain.pathUnit.direction then

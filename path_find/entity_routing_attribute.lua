@@ -82,6 +82,7 @@ end
 --- Special mod transport line mapping support. For mod belts, usually the function can automatically figure out the group.
 --- @type table<string, string>
 local specialTransportLineGroupMapping = {
+    ["offshore-pump"] = "pump",
     ["factory-input-pipe"] = "pipe",
     ["factory-output-pipe"] = "pipe"
 }
