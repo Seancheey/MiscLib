@@ -51,7 +51,16 @@ function logging.log(msg, loggingCategory)
         logging.addCategory(loggingCategory, true)
     end
     if logging.shouldOutput(loggingCategory) then
-        game.print(tostring(loggingCategory).. ": " .. (type(msg) == "string" and msg or serpent.line(msg)), {0.5,1,0.5})
+        game.print(tostring(loggingCategory) .. ": " .. (type(msg) == "string" and msg or serpent.line(msg)), { 0.5, 1, 0.5 })
+    end
+end
+
+--- Executes function only if the logging is enabled, hence save more operations in release mode
+--- If loggingCategory is not set enabled, by default it will not be logged
+--- @param msgFunc fun():string
+function logging.logLazy(msgFunc, loggingCategory)
+    if logging.shouldOutput(loggingCategory) then
+        logging.log(msgFunc(), loggingCategory)
     end
 end
 
