@@ -77,6 +77,7 @@ function TransportLineGroup.tryLoadAllGroups()
     TransportLineGroup.add("se-deep-space-transport-belt-yellow", "se-deep-space-underground-belt-yellow", "se-deep-space-splitter-yellow")
     TransportLineGroup.add("se-space-pipe", "se-space-pipe-to-ground")
     TransportLineGroup.add("kr-steel-pipe", "kr-steel-pipe-to-ground", nil, "kr-steel-pump")
+    TransportLineGroup.add("ht-pipes", "ht-pipes-to-ground")
 end
 
 --- Special mod transport line mapping support. For mod belts, usually the function can automatically figure out the group.
@@ -315,14 +316,14 @@ function EntityRoutingAttribute:inferLineGroup(entity_name)
             [EntityTransportType.splitter] = splitterVersion,
         }
     elseif EntityRoutingAttribute.from(entity_name).lineType == TransportLineType.fluidLine then
-        if EntityRoutingAttribute.from(entity_name).isUnderground == false then
-            -- TODO should find a way of associate fluid pipe's group
-            return {
-                [EntityTransportType.onGround] = game.entity_prototypes[entity_name],
-                [EntityTransportType.underground] = game.entity_prototypes["pipe-to-ground"],
-            }
-        end
-        -- By default, assume on ground is pipe, underground is pipe-to-ground
+        -- Infer fluid pipes based on its name. By default, assume on ground is pipe, underground is pipe-to-ground
+        local testPrefix = entity_name:gsub("-pipe$", ""):gsub("-pipe-to-ground$", ""):gsub("-pump$", "")
+        local inferredGroup = {
+            [EntityTransportType.onGround] = game.entity_prototypes[testPrefix .. "-pipe"] or game.entity_prototypes["pipe"],
+            [EntityTransportType.underground] = game.entity_prototypes[testPrefix .. "-pipe-to-ground"] or game.entity_prototypes["pipe-to-ground"],
+            [EntityTransportType.pump] = game.entity_prototypes[testPrefix .. "-pump"] or game.entity_prototypes["pump"]
+        }
+        return inferredGroup
     end
     log("failed to find line group of " .. entity_name)
     return nil
