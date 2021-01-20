@@ -25,6 +25,12 @@ function AsyncTaskManager:pushTask(taskFunction, priority)
     self.taskQueue:push(priority or 1, taskFunction)
 end
 
+function AsyncTaskManager:removeAllTasks()
+    while not self.taskQueue:isEmpty() do
+        self.taskQueue:pop()
+    end
+end
+
 function AsyncTaskManager:resolveTaskEveryNthTick(nthTick)
     script.on_nth_tick(nthTick, function()
         self:resolveOneTask();
